@@ -1,0 +1,976 @@
+\documentclass[11pt, a4paper]{article}
+
+% =========================================
+% 1. Page and Font Settings
+% =========================================
+\usepackage[top=1.5cm, bottom=1.5cm, left=1.5cm, right=1.5cm]{geometry}
+\usepackage{newtxtext}        
+\usepackage{newtxmath}        
+\usepackage[T1]{fontenc}
+\usepackage{microtype}        
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{enumitem}
+\usepackage{caption}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usetikzlibrary{arrows.meta, positioning}
+\usepackage{soul}
+% \usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+
+
+% =========================================
+% 2. Table of Contents Style Settings (Core Change: Larger Font)
+% =========================================
+\usepackage[titles]{tocloft} % Import package for TOC customization
+
+% --- Font settings for Section (Level 1 Header) ---
+% \Large = Large font size, \bfseries = Bold
+\renewcommand{\cftsecfont}{\Large}      % Font for section titles
+\renewcommand{\cftsecpagefont}{\Large}  % Font for page numbers
+\setlength{\cftbeforesecskip}{1em}      % Increase spacing before sections to avoid crowding
+\setlength{\cftsecnumwidth}{2em}        % Increase width reserved for section numbers
+
+% --- Font settings for Subsection (Level 2 Header) ---
+% \large = Slightly larger font size
+\renewcommand{\cftsubsecfont}{\large}     % Font for subsection titles
+\renewcommand{\cftsubsecpagefont}{\large} % Font for page numbers
+\setlength{\cftsubsecindent}{2em}         % Indentation (keep default or adjust)
+
+% --- Font settings for Subsubsection (Level 3 Header) ---
+\renewcommand{\cftsubsubsecfont}{\large}    % Keep normal size or adjust
+\renewcommand{\cftsubsubsecpagefont}{\large}
+
+% =========================================
+% 3. Other Style Customizations (titlesec & hyperref)
+% =========================================
+\usepackage{titlesec}
+\usepackage[bookmarks=true, colorlinks=false, pdfborder={1 0 0}]{hyperref}
+
+
+\setcounter{tocdepth}{3} 
+\setcounter{secnumdepth}{3}
+
+% =========================================
+% 4. Color Definitions (LADR Style)
+% =========================================
+\usepackage{xcolor}
+\definecolor{ladr_def_bg}{RGB}{246, 244, 231}    
+\definecolor{ladr_thm_bg}{RGB}{236, 238, 251}    
+\definecolor{ladr_teal}{RGB}{0, 163, 163}        
+\definecolor{ladr_orange}{RGB}{193, 104, 34}     
+\definecolor{ladr_blue}{RGB}{58, 116, 181}       
+\definecolor{ladr_red}{RGB}{186, 26, 52}         
+\definecolor{ladr_sec_bg}{RGB}{242, 235, 233}    
+\definecolor{ladr_graybox}{RGB}{220, 220, 220}   
+
+% =========================================
+% 5. Section Heading Format Settings (LADR Style Box)
+% =========================================
+\titleformat{\section}
+  {\huge\itshape} 
+  {\colorbox{ladr_sec_bg}{\makebox[1.5em][c]{\Large\bfseries\textcolor{ladr_red}{\thesection}}}}
+  {0.5em} 
+  {}
+
+\titleformat{\subsection}
+  {\Large\bfseries\color{ladr_teal}} 
+  {\thesubsection}                    
+  {0.5em}                              
+  {}
+
+\titleformat{\subsubsection}
+  {\large\bfseries\color{ladr_teal}} 
+  {\thesubsubsection}
+  {0.5em}
+  {}
+
+% =========================================
+% 6. Box Settings
+% =========================================
+\usepackage[most]{tcolorbox}
+
+\newtcolorbox{ladrbox}[2][]{
+    enhanced,
+    colback=#2,
+    colframe=#2,
+    arc=0pt, outer arc=0pt,
+    left=6pt, right=6pt, top=6pt, bottom=6pt,
+    boxsep=0pt,
+    #1
+}
+
+% Define Side Note Box (with Shadow)
+\newtcolorbox{sidenotebox}{
+    enhanced,
+    width=\linewidth,
+    colback=white,
+    colframe=gray!50,
+    boxrule=0.5pt,
+    arc=0pt,
+    drop shadow southeast={opacity=0.5}, %shadow xshift=2pt, shadow yshift=-2pt},
+    left=4pt, right=4pt, top=4pt, bottom=4pt,
+    fontupper=\small\itshape % Make internal text smaller and italic
+}
+
+% =========================================
+% 7. Custom Commands
+% =========================================
+\newcommand{\ladrsection}[2]{
+    \setcounter{section}{#1}     
+    \addtocounter{section}{-1}   
+    \section{#2}                 
+}
+
+\DeclareMathOperator{\rank}{rank}
+\DeclareMathOperator{\tr}{tr}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\calA}{\mathcal{A}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\qedbox}{\hfill\rule{1.5ex}{1.5ex}}
+
+\begin{document}
+
+% =========================================
+% Cover and Abstract
+% =========================================
+\thispagestyle{empty}
+\noindent
+\textbf{REPORT} \hspace{1em} Matrix Sensing \hspace{0.5em} December 2025
+\vspace{-0.8em}
+\par\noindent\rule{\textwidth}{0.4pt}
+\vspace{1em}
+
+\begin{center}
+    {\Huge\bfseries\textcolor{ladr_teal}{Matrix Sensing: From Convex Relaxations to Nonconvex Optimization}}
+    
+    \vspace{0.5em}
+    %{\Large A Learning Report}
+    
+    \vspace{0.5em}
+    \textbf{Yangfan Sun \quad Ruishu Zhang} \\
+    \vspace{0.5em}
+    {\large Johns Hopkins University}\\
+    \vspace{0.5em}
+    December 14, 2025
+    %\date{\today}
+\end{center}
+
+%\vspace{0.5em}
+
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{Abstract}}
+    \vspace{0.5em}
+    \par
+  This report studies the \textit{matrix sensing} problem, which involves recovering a low-rank matrix from a limited number of linear measurements. We examine two effective and complementary approaches: (i) a convex relaxation method based on nuclear norm minimization, and (ii) a non-convex optimization method based on the Burer-Monteiro decomposition. The central theme of this report is the \textit{Restricted Isometry Property} (R.I.P.), which serves as the theoretical foundation for the effectiveness of both methods. We demonstrate that RIP not only guarantees exact recovery via convex optimization but also ensures benign geometric properties for non-convex optimization. We conduct image recovery experiments that demonstrate the rapid recovery phase transition predicted by R.I.P. theory. While both methods exhibit similar recovery thresholds, the non-convex decomposition method is faster and more suitable for handling large-scale, high-dimensional matrix sensing problems.
+
+
+    
+\end{ladrbox}
+
+% =========================================
+% Table of Contents (Larger font applied here)
+% =========================================
+%\vspace{0.5em}
+{
+    \let\clearpage\relax        
+    \let\cleardoublepage\relax
+    \tableofcontents
+}
+\vspace{0.5em}
+
+% =========================================
+% 1. Introduction
+% =========================================
+\ladrsection{1}{Introduction}
+
+\noindent
+In modern data science, high-dimensional data often exhibits a low-dimensional structure. A ubiquitous model for this structure is the low-rank matrix. The problem of Matrix Sensing asks: can we recover a low-rank matrix $M_{*} \in \R^{n_{1} \times n_{2}}$ from a small set of linear observations?
+
+Mathematically, we observe a vector $y \in \R^{m}$ given by:
+\begin{equation}
+    y = \calA(M_{*}) %\tag{1}
+\end{equation}
+where $\calA: \R^{n_{1} \times n_{2}} \rightarrow \R^{m}$ is a linear map. 
+$$
+\mathcal{A}(M) = [\langle A_1, M \rangle, \langle A_2, M \rangle, \dots, \langle A_m, M \rangle]^T \quad \forall M \in \mathbb{R}^{n_1 \times n_2}
+$$
+The goal is to solve the Affine Rank Minimization problem:
+\begin{equation}
+\label{eq:arm}
+    \min_{X} \ \rank(X)
+    \quad \text{subject to} \quad
+    \mathcal{A}(X) = y.
+\end{equation}
+
+While intuitive, problem \eqref{eq:arm} is known to be NP-hard \cite{Recht2010}. Consequently, direct minimization is intractable in large dimensions. This report focuses on two primary strategies developed to overcome this difficulty: convex relaxation and nonconvex factorization.
+
+% =========================================
+% 2. The Convex Approach
+% =========================================
+\ladrsection{2}{The Convex Approach: Nuclear Norm Minimization}
+\label{sec:convex}
+
+\subsection{Relaxation to Convex Optimization}
+
+\noindent
+Analogous to the principles of Compressed Sensing, where the $\ell_1$ norm functions as a convex surrogate for sparsity (the $\ell_0$ norm), the \colorbox{ladr_def_bg}{\textbf{\textcolor{ladr_orange}{Nuclear Norm}}, defined as the sum of the singular values of a matrix ($\|X\|_* := \sum \sigma_i(X)$)}, serves as a convex proxy for matrix rank. 
+We first introduce the concept of the convex envelope in order to rigorously justify this substitution.
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_def_bg}
+    \textbf{\textcolor{ladr_orange}{
+        Definition \thetheorem \hspace{0.5em}
+        Convex Envelope
+        {\normalfont (\cite[Section~2]{Fazel02})}
+    }}
+    \label{def:convex-envelope}
+    \vspace{0.5em}
+    \par
+    Let $C$ be a given convex set. The convex envelope of a (possibly nonconvex)
+    function $f: C \rightarrow \mathbb{R}$ is defined as the largest convex
+    function $g$ such that $g(x) \le f(x)$ for all $x \in C$.
+\end{ladrbox}
+
+
+\noindent
+In the context of rank minimization, the relationship between the rank function and the nuclear norm is established by the following theorem:
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em}
+        Convex Envelope of Rank Function
+        {\normalfont (\cite[Lemma~2.2]{Fazel02})}
+    }}
+    \label{thm:convex-envelope-rank}
+    \vspace{0.5em}
+    \par
+    The convex envelope of $\rank(X)$ on the unit ball of the operator norm, defined as $\{X \in \R^{m \times n} : \norm{X} \le 1\}$, is the nuclear norm $\norm{X}_{*}$.
+\end{ladrbox}
+
+
+\noindent
+The proof is given in~\cite{Fazel02} and uses a basic result from convex analysis that establishes that (under some technical conditions) the biconjugate of a function is its convex envelope~\cite{HiriartUrrutyLemarechal93}.
+
+Lemma~\ref{thm:convex-envelope-rank} provides the theoretical foundation for using the nuclear norm heuristic in affine rank minimization problems. Consider a system of linear equations $\calA(X)=b$. Let $X_{0}$ denote the minimum rank solution to this system, and let $M=\norm{X_{0}}$ denote its operator norm. Applying Lemma~\ref{thm:convex-envelope-rank}, the convex envelope of the rank function on the set $C=\{X \in \R^{m \times n} : \norm{X} \le M\}$ is given by $\norm{X}_{*}/M$. If we define $X_{*}$ as the minimum nuclear norm solution to $\calA(X)=b$, the following inequality holds:
+\[
+    \norm{X_{*}}_{*}/M \le \rank(X_{0}) \le \rank(X_{*}),
+\]
+where this relationship provides both lower and upper bounds on the optimal rank, $\rank(X_{0})$, predicated on the knowledge of the optimal solution's norm. Furthermore, because the nuclear norm represents the tightest convex lower bound of the rank function on the set $C$, we are motivated to solve the following convex optimization problem:
+\begin{equation}
+\label{eq:nnm}
+    \min_{X} \norm{X}_{*} \quad \text{subject to} \quad \calA(X) = y 
+\end{equation}
+The formulation in Equation \eqref{eq:nnm} can be cast as a Semidefinite Program (SDP), which guarantees solvability in polynomial time.
+
+\subsection{Theoretical Guarantees: Restricted Isometry Property}
+
+\noindent
+To guarantee that the solution to the convex optimization problem is indeed the true low-rank matrix $X_{0}$, the measurement operator $\calA$ must satisfy specific structural properties. The most prominent of these is the Restricted Isometry Property (RIP) for matrices.
+
+%\vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_def_bg}
+    \textbf{\textcolor{ladr_orange}{
+        Definition \thetheorem \hspace{0.5em}
+        Restricted Isometry Property (R.I.P.)
+        {\normalfont (\cite[Definition~3.1]{Fazel02})}
+    }}
+    \label{def:rip}
+    \vspace{0.5em}
+    \par
+    Let $\calA : \R^{m \times n} \rightarrow \R^{p}$ be a linear map. Without loss of generality, assume $m \le n$. For every integer $r$ with $1 \le r \le m$, define the $r$-restricted isometry constant to be the smallest number $\delta_{r}(\calA)$ such that
+    \begin{equation}
+        (1-\delta_{r}(\calA))\norm{X}_{F}^{2} \le \norm{\calA(X)}^{2} \le (1+\delta_{r}(\calA))\norm{X}_{F}^{2} %\tag{4}
+    \end{equation}
+    holds for all matrices $X$ of rank at most $r$.
+\end{ladrbox}
+\noindent Intuitively speaking, a smaller R.I.P. constant means that the problem is easier
+to solve.\\
+%\vspace{1em}
+\noindent\textcolor{ladr_red}{\rule{\textwidth}{0.5pt}}
+
+\noindent\textbf{\textcolor{ladr_red}{Example A}} \textbf{(Good operator, R.I.P. holds)} \hspace{0.5em} $X=
+\begin{pmatrix}
+\cos\theta & 0\\
+\sin\theta & 0
+\end{pmatrix}
+, rank(X)=1, \|X\|_F=1
+$, \\
+$$\mathcal A=\{A_i\}=\left\{
+\begin{pmatrix}1&0\\0&0\end{pmatrix},
+\begin{pmatrix}0&1\\0&0\end{pmatrix},
+\begin{pmatrix}0&0\\1&0\end{pmatrix},
+\begin{pmatrix}0&0\\0&1\end{pmatrix}
+\right\}, \|\mathcal A(X)\|_2=\|\displaystyle (\cos\theta,0,\sin\theta,0)^\top\|_2=1=\|X\|_F $$
+
+% Using minipage for side-by-side layout
+\noindent
+\begin{minipage}[t]{0.38\textwidth}
+    \vspace{0pt} % For top alignment
+    \begin{sidenotebox}
+
+\textbf{Remark:} In Example A, the measurement operator $\mathcal A$ aligns with the non-zero structure of the rank-$1$ matrix $X$, meaning that the Frobenius norm of X is preserved under the mapping $\mathcal A$. This indicates that the operator acts as an approximate isometry on the rank-$1$ manifold, providing an example of a favourable instance in which the R.I.P. holds.
+
+    \end{sidenotebox}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.60\textwidth}
+    \vspace{0pt} 
+    \centering  
+    \includegraphics[width=\linewidth]{exA.jpg}
+    \captionof{figure}{R.I.P. $\mathcal{A}$} 
+    \label{fig:placeholder}
+\end{minipage}
+%\noindent{\rule{\textwidth}{1pt}}
+\noindent\textcolor{gray}{\rule{\textwidth}{0.5pt}}
+
+\noindent\textcolor{ladr_red}{\rule{\textwidth}{0.5pt}}
+\noindent\textbf{\textcolor{ladr_red}{Example B}} \textbf{(Bad operator, R.I.P. fails)} \hspace{0.5em} $X=
+\begin{pmatrix}
+\cos\theta & 0\\
+\sin\theta & 0
+\end{pmatrix}
+, rank(X)=1, \|X\|_F=1
+$, \\
+$$\mathcal A=\{A_i\}=\left\{
+\begin{pmatrix}1&0\\0&0\end{pmatrix},
+\begin{pmatrix}0&1\\0&0\end{pmatrix}
+\right\}, \|\mathcal A(X)\|_2=\|\displaystyle (\cos\theta,0)^\top\|_2^2=\cos^2\theta, \Rightarrow \delta(\mathcal{A}) \geq\sin^2\theta, \Rightarrow\delta\text{ can be large.} $$
+
+% Using minipage for side-by-side layout
+\noindent
+\begin{minipage}[t]{0.38\textwidth}
+    \vspace{0pt} % For top alignment
+    \begin{sidenotebox}
+
+\textbf{Remark:} In Example~B, the measurement operator $\mathcal A$ fails to sense the low-rank direction in which the matrix $X$ lies, which leads $\mathcal A(X)=0$ despite $X$ being nonzero. This demonstrates a fundamental violation of the R.I.P., as distinct rank-$1$ matrices become indistinguishable in the measurement space.
+
+    \end{sidenotebox}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.60\textwidth}
+    \vspace{0pt} 
+    \centering  
+    \includegraphics[width=\linewidth]{exB.jpg}
+    \captionof{figure}{Bad $\mathcal{A}$} 
+    \label{fig:placeholder}
+\end{minipage}
+%\vspace{0.5em}
+\noindent\textcolor{gray}{\rule{\textwidth}{0.5pt}}
+\begin{sidenotebox}
+\noindent
+\textbf{Remark: }The essence of the R.I.P. is about whether the measurement operator preserves the \textbf{geometric structure} in all low-rank directions.
+Geometrically, R.I.P means that the null space of $\mathcal A$ intersects the rank-$2r$ manifold only at the origin
+\end{sidenotebox}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\vspace{1em}
+\noindent
+We then establish that the R.I.P. is sufficient to guarantee uniqueness in the (intractable) rank-constrained problem.
+
+%\vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Theorem \thetheorem \hspace{0.5em}
+        Uniqueness of Low-Rank Solution
+        {\normalfont (\cite[Theorem~3.2]{Fazel02})}
+    }}
+    \label{thm:uni-sol}
+    \vspace{0.5em}
+    \par
+    Suppose that $\delta_{2r} < 1$ for some integer $r \ge 1$. Then $X_{0}$ is the only matrix of rank at most $r$ satisfying $\calA(X)=b$.
+\end{ladrbox}
+%\vspace{1em}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em} Assume, on the contrary, that there exists a rank-$r$ matrix $X$ satisfying $\calA(X)=b$ and $X \ne X_{0}$. Then $Z := X_{0} - X$ is a nonzero matrix of rank at most $2r$, and $\calA(Z) = 0$. But then
+\[
+    0 = \norm{\calA(Z)} \ge (1-\delta_{2r})\norm{Z}_{F} > 0,
+\]
+which is a contradiction. \qedbox
+\begin{sidenotebox}
+\noindent
+\textbf{Remark: }RIP ensures that the null space of $\mathcal A$ contains no nonzero low-rank matrices.
+As a result, the true low-rank solution is uniquely identifiable from the measurements
+\end{sidenotebox}
+%\vspace{1em}
+\noindent
+Our main result concerns the success of the nuclear norm relaxation.
+
+%\vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Theorem \thetheorem \hspace{0.5em}
+        Exact Recovery under RIP
+        {\normalfont (\cite[Theorem~3.3]{Fazel02})}
+    }}
+    \label{thm:exact}
+    \vspace{0.5em}
+    \par
+    Suppose that $r > 1$ is such that $\delta_{5r} < 1/10$. Then $X^{*} = X_{0}$.
+\end{ladrbox}
+%\vspace{1em}
+
+\noindent
+To establish Theorem~\ref{thm:exact}, we require two technical lemmas regarding matrix decomposition and the additivity of the nuclear norm. The following lemma is particularly critical: it demonstrates that for any two matrices $A$ and $B$, the matrix $B$ can be decomposed into a sum $B_{1} + B_{2}$, where the rank of $B_{1}$ is bounded relative to $A$, and $B_{2}$ satisfies specific orthogonality conditions. This decomposition forms the structural foundation for the proof of Theorem~\ref{thm:exact}.
+
+% \vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em}
+        Matrix Decomposition
+        {\normalfont (\cite[Lemma~3.4]{Fazel02})}
+    }}
+    \label{lem:matrix-decomposition}
+    \vspace{0.5em}
+    \par
+    Let $A$ and $B$ be matrices of the same dimensions. Then there exist matrices
+    $B_{1}$ and $B_{2}$ such that:
+    \begin{enumerate}[label=(\roman*), ref=\roman*]
+        \item \label{lem:item:decomp} $B = B_{1} + B_{2}$.
+        \item \label{lem:item:rank} $\rank(B_{1}) \le 2 \rank(A)$.
+        \item \label{lem:item:orth} $AB_{2}^{\prime} = 0$ and $A^{\prime}B_{2} = 0$.
+        \item \label{lem:item:inner} $\langle B_{1}, B_{2} \rangle = 0$.
+    \end{enumerate}
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em}
+Consider a full singular value decomposition of $A$:
+\[
+    A = U \begin{bmatrix} \Sigma & 0 \\ 0 & 0 \end{bmatrix} V^{\prime},
+\]
+and let $\hat{B} := U^{\prime}BV$. Partition $\hat{B}$ as:
+\[
+    \hat{B} = \begin{bmatrix} \hat{B}_{11} & \hat{B}_{12} \\ \hat{B}_{21} & \hat{B}_{22} \end{bmatrix}.
+\]
+Defining now:
+\[
+    B_{1} := U \begin{bmatrix} \hat{B}_{11} & \hat{B}_{12} \\ \hat{B}_{21} & 0 \end{bmatrix} V^{\prime}, \quad
+    B_{2} := U \begin{bmatrix} 0 & 0 \\ 0 & \hat{B}_{22} \end{bmatrix} V^{\prime},
+\]
+it can be easily verified that $B_{1}$ and $B_{2}$ satisfy
+conditions~(\ref{lem:item:decomp})--(\ref{lem:item:inner}). \qedbox
+
+%\vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em}
+        Nuclear Norm Additivity
+        {\normalfont (\cite[Lemma~2.3]{Fazel02})}
+    }}
+    \label{lem:nuclear-norm-additivity}
+    \vspace{0.5em}
+    \par
+    Let $A$ and $B$ be matrices of the same dimensions. If $AB^{\prime} = 0$ and $A^{\prime}B = 0$ then
+    \[
+        \norm{A+B}_{*} = \norm{A}_{*} + \norm{B}_{*}.
+    \]
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em} Partition the singular value decompositions of $A$ and $B$ to reflect the zero and non-zero singular vectors:
+\[
+    A = \begin{bmatrix} U_{A1} & U_{A2} \end{bmatrix} \begin{bmatrix} \Sigma_{A} & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} V_{A1} & V_{A2} \end{bmatrix}^{\prime}, \quad
+    B = \begin{bmatrix} U_{B1} & U_{B2} \end{bmatrix} \begin{bmatrix} \Sigma_{B} & 0 \\ 0 & 0 \end{bmatrix} \begin{bmatrix} V_{B1} & V_{B2} \end{bmatrix}^{\prime}.
+\]
+The condition $AB^{\prime}=0$ implies that $V_{A1}^{\prime}V_{B1}=0$, and similarly, $A^{\prime}B=0$ implies that $U_{A1}^{\prime}U_{B1}=0$. Hence, there exist matrices $U_{C}$ and $V_{C}$ such that $\begin{bmatrix} U_{A1} & U_{B1} & U_{C} \end{bmatrix}$ and $\begin{bmatrix} V_{A1} & V_{B1} & V_{C} \end{bmatrix}$ are orthogonal matrices. Thus, the following are valid singular value decompositions for $A$ and $B$:
+\[
+    A+B = \begin{bmatrix} U_{A1} & U_{B1} \end{bmatrix} \begin{bmatrix} \Sigma_{A} & 0 \\ 0 & \Sigma_{B} \end{bmatrix} \begin{bmatrix} V_{A1} & V_{B1} \end{bmatrix}^{\prime}.
+\]
+This shows that the singular values of $A+B$ are equal to the union (with repetition) of the singular values of $A$ and $B$. Hence, $\norm{A+B}_{*} = \norm{A}_{*} + \norm{B}_{*}$, as desired. \qedbox
+
+\vspace{1em}
+\noindent
+We now proceed to a proof of Theorem~\ref{thm:exact}.
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof of Theorem~\ref{thm:exact}}} \hspace{0.5em} By optimality of $X^{*}$, we have $\norm{X_{0}}_{*} \ge \norm{X^{*}}_{*}$. Let $R := X^{*} - X_{0}$. Applying Lemma \ref{lem:matrix-decomposition} to the matrices $X_{0}$ and $R$, there exist matrices $R_{0}$ and $R_{c}$ such that $R = R_{0} + R_{c}$, $\rank(R_{0}) \le 2 \rank(X_{0})$, and $X_{0}R_{c}^{\prime} = 0$ and $X_{0}^{\prime}R_{c} = 0$. Then,
+\[
+    \norm{X_{0}}_{*} \ge \norm{X_{0} + R}_{*} \ge \norm{X_{0} + R_{c}}_{*} - \norm{R_{0}}_{*} = \norm{X_{0}}_{*} + \norm{R_{c}}_{*} - \norm{R_{0}}_{*},
+\]
+where the middle assertion follows from the triangle inequality and the last one from Lemma \ref{lem:nuclear-norm-additivity}. Rearranging terms, we can conclude that $\norm{R_{0}}_{*} \ge \norm{R_{c}}_{*}$.
+
+Next we partition $R_{c}$ into a sum of matrices $R_{1}, R_{2}, \dots,$ each of rank at most $3r$. Let $R_{c} = U \diag(\sigma) V^{\prime}$ be the singular value decomposition of $R_{c}$. For each $i \ge 1$ define the index set $I_{i} = \{3r(i-1)+1, \dots, 3ri\}$, and let $R_{i} := U_{I_{i}} \diag(\sigma_{I_{i}}) V_{I_{i}}^{\prime}$. By construction, we have
+\[
+    \sigma_{k} \le \frac{1}{3r} \sum_{j \in I_{i}} \sigma_{j} \quad \forall k \in I_{i+1}
+\]
+which implies $\norm{R_{i+1}}_{F}^{2} \le \frac{1}{3r} \norm{R_{i}}_{*}^{2}$. We can then compute the following bound:
+\[
+    \sum_{j \ge 2} \norm{R_{j}}_{F} \le \frac{1}{\sqrt{3r}} \sum_{j \ge 1} \norm{R_{j}}_{*} = \frac{1}{\sqrt{3r}} \norm{R_{c}}_{*} \le \frac{1}{\sqrt{3r}} \norm{R_{0}}_{*} \le \frac{\sqrt{2r}}{\sqrt{3r}} \norm{R_{0}}_{F},
+\]
+where the last inequality follows from $\norm{X}_{F} \le \norm{X}_{*} \le \sqrt{r} \norm{X}_{F}$ and the fact that $\rank(R_{0}) \le 2r$.
+
+Finally, note that the rank of $R_{0} + R_{1}$ is at most $5r$, so we may put this all together as:
+\begin{align*}
+    \norm{\calA(R)} &\ge \norm{\calA(R_{0} + R_{1})} - \sum_{j \ge 2} \norm{\calA(R_{j})} \\
+    &\ge (1 - \delta_{5r}) \norm{R_{0} + R_{1}}_{F} - (1 + \delta_{3r}) \sum_{j \ge 2} \norm{R_{j}}_{F} \\
+    &\ge \left( (1 - \delta_{5r}) - \sqrt{\frac{2}{3}}(1 + \delta_{3r}) \right) \norm{R_{0}}_{F} \\
+    &\ge \left( (1 - \delta_{5r}) - \frac{9}{11}(1 + \delta_{3r}) \right) \norm{R_{0}}_{F}.
+\end{align*}
+By assumption $\calA(R) = \calA(X^{*} - X_{0}) = 0$, so if the factor on the right-hand side is strictly positive, $R_{0} = 0$, which further implies $R_{c} = 0$ and thus $X^{*} = X_{0}$. Simple algebra reveals that the right-hand side is positive when $9\delta_{3r} + 11\delta_{5r} < 2$. Since $\delta_{3r} \le \delta_{5r}$, we immediately have that $X^{*} = X_{0}$ if $\delta_{5r} < 1/10$. \qedbox
+
+\begin{sidenotebox}
+\noindent
+\textbf{Remark: }Theorem 2.5 explains why nuclear
+norm minimization succeeds despite relaxing a nonconvex rank constraint. Under R.I.P., the geometry of the feasible set ensures that the convex surrogate does not introduce spurious minimisers, meaning that the unique minimum-nuclear-norm solution coincides with the minimum-rank solution.
+\end{sidenotebox}
+% =========================================
+% 3. Nonconvex Approach
+% =========================================
+\ladrsection{3}{The Nonconvex Approach: Factorized Optimization}
+\label{sec:nonconvex}
+\noindent
+While nuclear norm minimization is polynomial time, SDP solvers (like interior point methods) typically scale as $O(n^{3})$ or $O(n^{4})$, which is prohibitive for large-scale data. In contrast, the nonconvex approach discussed below offers better scalability.
+
+\subsection{Problem Formulation}
+
+\noindent
+In this section, we focus on the case where the underlying matrix of interest is symmetric positive semidefinite. Instead of optimizing over the full matrix $X \in \R^{n \times n}$, we enforce the rank constraint and the positive semidefinite property explicitly by parametrizing $X$ using the Burer-Monteiro factorization:
+\begin{equation}
+    X = UU^{\top}, \quad \text{where } U \in \R^{n \times r} %\tag{3}
+\end{equation}
+This reduces the number of variables from $n(n+1)/2$ to $nr$. Consequently, the matrix sensing problem transforms into an unconstrained nonconvex optimization problem with respect to the factor $U$:
+\begin{equation}
+\label{eq:nonconvex-factorization}
+    \min_{U \in \R^{n \times r}} f(U) = \frac{1}{2} \norm{\calA(UU^{\top}) - y}_{2}^{2} %\tag{4}
+\end{equation}
+
+\subsection{Optimization Landscape Analysis}
+
+\noindent
+The primary fear in nonconvex optimization is getting stuck in spurious local minima. However, it has been proved that for many matrix sensing problems, the landscape is benign. This following theorem confirms that all local minima of $f(U)$ are global minima (i.e., $UU^{\top} = X^{*}$) under mild RIP.
+
+\subsubsection{No Spurious Local Minima}
+
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Theorem \thetheorem \hspace{0.5em} No Spurious Local Minima
+        {\normalfont (\cite[Theorem~4.1]{Bhojanapalli2016})}
+    }}
+    \label{thm:no-spurious}
+    \vspace{0.5em}
+    \par
+    Consider the nonconvex optimization problem~\eqref{eq:nonconvex-factorization}. Assume:
+    \begin{enumerate}
+        \item $\rank(X^{*}) \le r$ (target matrix is low-rank),
+        \item $\calA$ satisfies $(2r, \delta_{2r})$-RIP with $\delta_{2r} < \frac{1}{5}$.
+    \end{enumerate}
+    Then, for any local minimum $U$ of $f(U)$, we have:
+    \[
+        UU^{\top} = X^{*}.
+    \]
+\end{ladrbox}
+
+
+\noindent
+To prove this theorem, we first establish four key lemmas (from \cite{Bhojanapalli2016} Section 4) that connect first/second-order optimality conditions to the error $\norm{UU^{\top} - X^{*}}_{F}$.
+
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em} RIP Bilinear Bound
+        {\normalfont (\cite[Lemma~4.1]{Bhojanapalli2016})}
+    }}
+    \label{lem:rip-bilinear}
+    \vspace{0.5em}
+    \par
+    Given $n \times n$ matrices $X, Y$, with $\rank(X\pm Y) \le 2r$ and a $(2r, \delta)$-RIP operator $\calA$, the following holds:
+    \[
+        \left| \frac{1}{m} \sum_{i=1}^{m} \langle A_{i}, X \rangle \langle A_{i}, Y \rangle - \langle X, Y \rangle \right| \le \delta \norm{X}_{F} \norm{Y}_{F}.
+    \]
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em} W.L.O.G., assume $\norm{X}_{F} = \norm{Y}_{F} = 1$. By the Polarization Identity:
+\[
+    4\langle \calA(X), \calA(Y) \rangle = \norm{\calA(X+Y)}^{2} - \norm{\calA(X-Y)}^{2}, \quad
+    4\langle X, Y \rangle = \norm{X+Y}_{F}^{2} - \norm{X-Y}_{F}^{2}.
+\]
+\begin{align*}
+    4(\langle \calA(X), \calA(Y) \rangle - \langle X, Y \rangle) &= (\norm{\calA(X+Y)}^{2} - \norm{X+Y}_{F}^{2}) \\
+    &\quad - (\norm{\calA(X-Y)}^{2} - \norm{X-Y}_{F}^{2}).
+\end{align*}
+By the RIP definition, for any $Z$ with $\rank \le 2r$, we have $|\norm{\calA(Z)}^{2} - \norm{Z}_{F}^{2}| \le \delta \norm{Z}_{F}^{2}$. Since $X+Y$ and $X-Y$ have $\rank \le 2r$, and by Triangular Inequality:
+\begin{align*}
+    4|\Delta| &\le \left| \norm{\calA(X+Y)}^{2} - \norm{X+Y}_{F}^{2} \right| + \left| \norm{\calA(X-Y)}^{2} - \norm{X-Y}_{F}^{2} \right| \\
+    &\le \delta \norm{X+Y}_{F}^{2} + \delta \norm{X-Y}_{F}^{2} \\
+    &= \delta \cdot 2 (\norm{X}_{F}^{2} + \norm{Y}_{F}^{2}) = \delta \cdot 2(1+1) = 4\delta.
+\end{align*}
+Scaling back to general norms, this implies:
+\[
+    |\langle \calA(X), \calA(Y) \rangle - \langle X, Y \rangle| \le \delta \norm{X}_{F} \norm{Y}_{F}.
+\]
+\qedbox
+
+\vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em} Subspace Error Bound
+        {\normalfont (\cite[Lemma~4.2]{Bhojanapalli2016})}
+    }}
+    \label{lem:subspace-error}
+    \vspace{0.5em}
+    \par
+    Let $U$ be a first-order stationary point of $f(U)$ (i.e., $\nabla f(U)=0$), and let $Q \in \R^{n \times r}$ be an orthonormal matrix spanning the column space of $U$ (i.e., $U=QR$ for invertible $R \in \R^{r \times r}$). Under $(2r, \delta)$-RIP, the error of $UU^{\top}$ relative to $X^{*}$ satisfies:
+    \[
+        \norm{(UU^{\top} - X^{*})QQ^{\top}}_{F} \le \delta \norm{UU^{\top} - X^{*}}_{F}.
+    \]
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof Sketch}} \hspace{0.5em} Let $U=QR$ for some orthonormal $Q$. Consider any matrix of the form $ZQR^{-1\top}$. The first order optimality condition $(\sum_{i=1}^{m} \langle A_{i}, UU^{\top} - U^{*}U^{*\top} \rangle A_{i}U = 0)$ then implies,
+\[
+    \sum_{i=1}^{m} \langle A_{i}, UU^{\top} - U^{*}U^{*} \rangle \langle A_{i}, UR^{-1}Q^{\top}Z^{\top} \rangle = 0.
+\]
+The above equation together with RIP gives us the following inequality:
+\[
+    |\langle UU^{\top} - U^{*}U^{*}, QQ^{\top}Z^{\top} \rangle| \le \delta \norm{UU^{\top} - U^{*}U^{*\top}}_{F} \norm{QQ^{\top}Z^{\top}}_{F}.
+\]
+Note that for any matrix $A$, $\langle A, QQ^{\top}Z \rangle = \langle QQ^{\top}A, Z \rangle$. Furthermore, for any matrix $A$, $\sup_{\{Z:\norm{Z}_{F} \le 1\}} \langle A, Z \rangle = \norm{A}_{F}$. Hence the above inequality implies the lemma statement. \qedbox
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em} Hessian Computation
+        {\normalfont (\cite[Lemma~4.3]{Bhojanapalli2016})}
+    }}
+    \label{lem:hessian-computation}
+    \vspace{0.5em}
+    \par
+    Let $U$ be a first-order stationary point of $f(U)$. For $r \times r$ orthonormal matrix $R$, define $\Delta = U - U^{*}R$ (aligning $U$ with $X^{*} = U^{*}U^{*\top}$) and $\Delta_{j} = \Delta e_{j} e_{j}^{\top}$ (where $e_{j}$ is the $j$-th standard basis vector in $\R^{r}$). Then:
+    \[
+        \sum_{j=1}^{r} \text{vec}(\Delta_{j})^{\top} \nabla^{2}f(U) \text{vec}(\Delta_{j}) = \sum_{i=1}^{m} \left( 4\sum_{j=1}^{r} \langle A_{i}, U\Delta_{j}^{\top} \rangle^{2} - 2\langle A_{i}, UU^{\top} - X^{*} \rangle^{2} \right).
+    \]
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em} For any matrix $Z$, taking directional second derivative of the function $f(U)$ with respect to $Z$ we get:
+\begin{align*}
+    \text{vec}(Z)^{\top} [\nabla^{2}f(U)] \text{vec}(Z) &= \text{vec}(Z)^{\top} \lim_{t \rightarrow 0} \frac{[\nabla f(U+tZ) - \nabla f(U)]}{t} \\
+    &= 2\sum_{i=1}^{m} [\langle A_{i}, UZ^{\top} \rangle^{2} + \langle A_{i}, UU^{\top} - U^{*}U^{*\top} \rangle \langle A_{i}, ZZ^{\top} \rangle].
+\end{align*}
+Setting $Z = \Delta_{j} = (U - U^{*}R)e_{j}e_{j}^{\top}$ and using the first order optimality condition on $U$, we get,
+\begin{align*}
+    &\text{vec}((U - U^{*}R)e_{j}e_{j}^{\top})^{\top} [\nabla^{2}f(U)] \text{vec}((U - U^{*}R)e_{j}e_{j}^{\top}) \\
+    &= \sum_{i=1}^{m} 4\langle A_{i}, U\Delta_{j}^{\top} \rangle^{2} + 2\langle A_{i}, UU^{\top} - U^{*}U^{*\top} \rangle \langle A_{i}, \Delta_{j}\Delta_{j}^{\top} \rangle \\
+    &\stackrel{(i)}{=} \sum_{i=1}^{m} 4\langle A_{i}, Ue_{j}e_{j}^{\top}\Delta_{j}^{\top} \rangle^{2} + 2\langle A_{i}, UU^{\top} - U^{*}U^{*} \rangle \langle A_{i}, Ue_{j}e_{j}^{\top}(U^{*}e_{j}e_{j}^{\top})^{\top} \rangle \\
+    &\stackrel{(ii)}{=} \sum_{i=1}^{m} 4\langle A_{i}, Ue_{j}e_{j}^{\top}\Delta_{j}^{\top} \rangle^{2} - 2\langle A_{i}, UU^{\top} - U^{*}U^{*} \rangle \langle A_{i}, U^{*}e_{j}e_{j}^{\top}(U^{*}e_{j}e_{j}^{\top})^{\top} \rangle.
+\end{align*}
+(i) and (ii) follow from the first order optimality condition $(\sum_{i=1}^{m} \langle A_{i}, UU^{\top} - U^{*}U^{*\top} \rangle A_{i}U = 0)$:
+\[
+    \sum_{i=1}^{m} \langle A_{i}, UU^{\top} \rangle Ue_{j}e_{j}^{\top} = \sum_{i=1}^{m} \langle A_{i}, U^{*}U^{*T} \rangle Ue_{j}e_{j}^{\top},
+\]
+for $j=1 \dots r$. Finally taking sum over $j$ from 1 to $r$ gives the result. \qedbox
+
+\vspace{1em}
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Corollary \thetheorem \hspace{0.5em} Second-Order Optimality: Error Lower Bound
+        {\normalfont (\cite[Corollary~4.1]{Bhojanapalli2016})}
+    }}
+    \label{cor:second-order-error}
+    \vspace{0.5em}
+    \par
+    Let $U$ be a local minimum of $f(U)$ (so $\nabla^{2}f(U)$ is positive semi-definite). Under $(2r, \delta)$-RIP, for any $r \times r$ orthonormal matrix $R$:
+    \[
+        \sum_{j=1}^{r} \norm{Ue_{j}e_{j}^{\top}(U - U^{*}R)^{\top}}_{F}^{2} \ge \frac{1-\delta}{2(1+\delta)} \norm{UU^{\top} - X^{*}}_{F}^{2}.
+    \]
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em} Since $U$ is a local minimum, the Hessian quadratic form is non-negative, so by Lemma~\ref{lem:hessian-computation}, substitute the Hessian expression and rearrange:
+\[
+    4\sum_{i=1}^{m} \sum_{j=1}^{r} \langle A_{i}, U\Delta_{j}^{\top} \rangle^{2} \ge 2\sum_{i=1}^{m} \langle A_{i}, UU^{\top} - X^{*} \rangle^{2}.
+\]
+Apply $(2r, \delta)$-RIP to both sides:
+\[
+    \sum_{i=1}^{m} \langle A_{i}, U\Delta_{j}^{\top} \rangle^{2} \le m(1+\delta) \norm{U\Delta_{j}^{\top}}_{F}^{2} \quad \text{(RIP upper bound)},
+\]
+\[
+    \sum_{i=1}^{m} \langle A_{i}, UU^{\top} - X^{*} \rangle^{2} \ge m(1-\delta) \norm{UU^{\top} - X^{*}}_{F}^{2} \quad \text{(RIP lower bound)}.
+\]
+Divide both sides by $2m(1+\delta)$ and sum over $j$ to get the lower bound. \qedbox
+
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Lemma \thetheorem \hspace{0.5em} Factor Space vs.\ Matrix Space Error
+        {\normalfont (\cite[Lemma~4.4]{Bhojanapalli2016})}
+    }}
+    \label{lem:factor-vs-matrix-error}
+    \vspace{0.5em}
+    \par
+    Let $Q$ be an orthonormal matrix spanning the column space of $U$. There exists $r \times r$ orthonormal matrix $R$ such that for any first-order stationary point $U$:
+    \[
+        \sum_{j=1}^{r} \norm{Ue_{j}e_{j}^{\top}(U - U^{*}R)^{\top}}_{F}^{2} \le \frac{1}{8} \norm{UU^{\top} - X^{*}}_{F}^{2} + \frac{34}{8} \norm{(UU^{\top} - X^{*})QQ^{\top}}_{F}^{2}.
+    \]
+\end{ladrbox}
+
+\noindent
+\textbf{\textcolor{ladr_red}{Proof}} \hspace{0.5em} Omit due to space limit (see \cite{Bhojanapalli2016} Section E).
+
+\vspace{1em}
+\noindent
+\textbf{\textcolor{ladr_red}{Proof of Theorem~\ref{thm:no-spurious}.}}
+\hspace{0.5em} Assume for contradiction that $UU^{\top} \ne X^{*}$. We combine Lemmas~\ref{lem:subspace-error},~\ref{lem:factor-vs-matrix-error},
+and Corollary~\ref{cor:second-order-error}
+to derive a contradiction.
+\begin{enumerate}[label=(\arabic*)]
+    \item \label{pf:item:error-proj} Let $E = UU^{\top} - X^{*}$ (error matrix). By Lemma~\ref{lem:subspace-error}:
+    \[
+        \norm{EQQ^{\top}}_{F} \le \delta \norm{E}_{F} \Rightarrow \norm{EQQ^{\top}}_{F}^{2} \le \delta^{2} \norm{E}_{F}^{2}.
+    \]
+    \item \label{pf:item:lower-bound} By Corollary~\ref{cor:second-order-error} (second-order lower bound):
+    \[
+        \sum_{j=1}^{r} \norm{Ue_{j}e_{j}^{\top}(U - U^{*}R)^{\top}}_{F}^{2} \ge \frac{1-\delta}{2(1+\delta)} \norm{E}_{F}^{2}.
+    \]
+    \item \label{pf:item:upper-bound} By Lemma~\ref{lem:factor-vs-matrix-error}:
+    \[
+        \sum_{j=1}^{r} \norm{Ue_{j}e_{j}^{\top}(U - U^{*}R)^{\top}}_{F}^{2} \le \frac{1}{8} \norm{E}_{F}^{2} + \frac{34}{8} \norm{EQQ^{\top}}_{F}^{2}.
+    \]
+\end{enumerate}
+Combining items~\ref{pf:item:error-proj}--\ref{pf:item:upper-bound}, we obtain:
+\[
+    \frac{1-\delta}{2(1+\delta)} \norm{E}_{F}^{2} \le \frac{1}{8} \norm{E}_{F}^{2} + \frac{34}{8} \delta^{2} \norm{E}_{F}^{2}.
+\]
+Since $\norm{E}_{F} \ne 0$ (by assumption), divide both sides by $\norm{E}_{F}^{2}$ and substitute $\delta < \frac{1}{5}$:
+\begin{align*}
+    LHS &= \frac{1-1/5}{2(1+1/5)} = \frac{4/5}{12/5} = \frac{1}{3} \approx 0.333 \\
+    RHS &= \frac{1}{8} + \frac{34}{8} \cdot (1/5)^{2} = \frac{1}{8} + \frac{34}{200} = 0.125 + 0.17 = 0.295
+\end{align*}
+This gives $0.333 \le 0.295$, a contradiction. Thus, our initial assumption is false, and $UU^{\top} = X^{*}$. \qedbox
+\begin{sidenotebox}
+    \textbf{Remark: }Theorem~3.1 establishes that, under RIP, the nonconvex factorized objective has no spurious local minima.
+Therefore, nonconvexity does not introduce statistical or geometric pathologies.
+Every local minimum corresponds to the global optimum.
+\end{sidenotebox}
+
+\subsubsection{Strict Saddles}
+
+\noindent
+All saddle points of $f(U)$ have strictly negative curvature, allowing optimization algorithms (e.g., SGD) to escape. This result is critical for global convergence from random initialization.
+
+\refstepcounter{theorem}
+\begin{ladrbox}{ladr_thm_bg}
+    \textbf{\textcolor{ladr_blue}{
+        Theorem \thetheorem \hspace{0.5em} Strict Saddles
+        {\normalfont (\cite[Theorem~3.2]{Bhojanapalli2016})}
+    }}
+    \label{thm:strict-saddles}
+    \vspace{0.5em}
+    \par
+    Consider the nonconvex optimization problem. Assume:
+    \begin{enumerate}
+        \item $\rank(X^{*}) \le r$,
+        \item $\calA$ satisfies $(2r, \delta_{2r})$-RIP with $\delta_{2r} < \frac{1}{10}$.
+    \end{enumerate}
+    Let $U$ be a first-order stationary point of $f(U)$ with $UU^{\top} \ne X^{*}$. Then the smallest eigenvalue of the Hessian satisfies:
+    \[
+        \lambda_{\min}(\frac{1}{m} \nabla^{2}f(U)) \le -\frac{4}{5} \sigma_{r}(X^{*})
+    \]
+    where $\sigma_{r}(X^{*})$ is the $r$-th largest singular value of $X^{*}$.
+\end{ladrbox}
+
+
+\noindent
+The proof (omitted here for brevity) uses Lemma~\ref{lem:hessian-computation} (Hessian computation) and RIP to bound the Hessian's smallest eigenvalue, showing that saddle points have a direction of strictly negative curvature.
+\begin{sidenotebox}
+\textbf{Remark:} The strict saddle property ensures that all non-optimal stationary points have negative curvature directions.
+Consequently, first-order methods with noise (e.g. SGD) can escape saddle points and converge globally from random initialization.
+\end{sidenotebox}
+% =========================================
+% 4. Application + Experiments (Merged)
+% =========================================
+\ladrsection{4}{Application and Numerical Experiments}
+\subsection{Applications}
+\noindent
+Matrix Sensing serves as a foundational tool across diverse disciplines, exploiting the fact that high-dimensional real-world data often admits a low-dimensional representation. Its utility spans from direct structural recovery to indirect algorithmic enhancements:
+\begin{itemize}
+    \item \textbf{Computer Vision:} The framework is extensively applied to image compression, noise reduction, and background subtraction by isolating low-rank structures from sparse errors\cite{Wright2009}.
+    \item \textbf{Machine Learning:} Beyond classical statistical learning, low-rank approximations are increasingly vital for accelerating the fine-tuning of Large Language Models (LLMs) and preventing overfitting by simplifying model complexity\cite{Hu2021}.
+    \item \textbf{Network Analysis:} These techniques also help infer hidden states in complex social or biological networks from incomplete observational data\cite{Lin2016}.
+\end{itemize}
+
+\noindent
+The following section focuses on a visual demonstration in image recovery to intuitively illustrate the efficacy of the convex and nonconvex approaches.
+
+\subsection{Image Recovery: The Hopkins Logo}
+
+\noindent
+Having established the theoretical foundations, we now demonstrate the practical efficacy of these methodologies in the context of \textbf{Image Recovery}. An image can be mathematically modeled as a matrix, where entries correspond to pixel intensities. Since natural images often possess significant correlations, they can be well-approximated by low-rank matrices.
+
+We consider the recovery of the Hopkins logo from a limited set of linear measurements. To ensure the ground truth $M_*$ is strictly low-rank, we first compute the Singular Value Decomposition (SVD) of the original image and truncate it to rank $r=6$.
+
+The recovery task is to solve:
+\begin{equation}
+    \text{Find } M_* \quad \text{given } y = \calA(M_*)
+\end{equation}
+where $\calA$ is a random Gaussian measurement operator.
+
+\subsection{Numerical Results}
+
+\noindent
+We compare the two approaches discussed in Sections~\ref{sec:convex} and~\ref{sec:nonconvex}.
+
+%\vspace{1em}
+
+% --- Group 1: Recovery Quality ---
+\noindent
+\begin{minipage}[t]{0.28\textwidth} % Left text area, width 28%
+    \vspace{0pt} % For top alignment
+    \textbf{Convex vs. Nonconvex Recovery Quality:} 
+    Both the convex and non-convex methods consistently recover the low-rank logo accurately (using the SVD truncation method to obtain a low-rank logo). When multiple random initial points are used, the non-convex method often converges on visually similar solutions, which illustrates the benign nature of the optimization landscape.
+\end{minipage}%
+\hfill % Fill horizontal space automatically
+\begin{minipage}[t]{0.68\textwidth} % Right image area, width 68%
+    \vspace{0pt} % For top alignment
+    \centering
+    % Note: Not using figure environment, inserting image directly
+    \includegraphics[width=\linewidth]{logos.png}
+    % Use captionof to generate caption, belongs to figure type
+    \captionof{figure}{ Reconstruction comparison on the Hopkins logo ($\rank \ r=6$).}
+\end{minipage}
+
+\vspace{0.5em} % Vertical space between groups
+
+% --- Group 2: Computational Efficiency ---
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+    \vspace{0pt}
+    \textbf{Computational Efficiency and Scalability:} 
+    The convex approach becomes computationally prohibitive, whereas the nonconvex method scales favorably.
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \vspace{0pt}
+    \textbf{Phase Transition with Respect to Measurement Budget:} 
+    We also examine the relationship between recovery accuracy and the number of measurements. Both methods exhibit a sharp phase transition.
+\end{minipage}
+
+\vspace{1em}
+
+% --- Group 3: Phase Transition ---
+\noindent
+\begin{minipage}[t]{0.48\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth]{efficiency.jpg}
+    \captionof{figure}{Runtime comparison as the matrix dimension increases.}
+\end{minipage}%
+\hfill
+\begin{minipage}[t]{0.48\textwidth}
+    \vspace{0pt}
+    \centering
+    \includegraphics[width=\linewidth]{phase.jpg}
+    \captionof{figure}{Recovery accuracy v.s. number of measurements.}
+\end{minipage}
+
+\vspace{1em}
+
+\noindent
+These experiments demonstrate that, provided the number of measurements and initial points are random, nonconvex factorized optimization can match the recovery accuracy of convex relaxations while offering superior scalability.
+
+
+% =========================================
+% 6. Conclusion
+% =========================================
+% \ladrsection{5}{Conclusion}
+
+% \noindent
+% Matrix sensing bridges the gap between classical linear algebra and modern compressive sampling. While convex relaxation provides the theoretical bedrock with deterministic guarantees via RIP, the modern paradigm shifts toward nonconvex optimization. By leveraging the benign global geometry of low-rank problems, nonconvex methods offer a practical path for solving high-dimensional problems in signal processing and machine learning.
+
+%\vspace{2em}
+% =========================================
+% References
+% =========================================
+% \noindent
+% {\Large\bfseries\textcolor{ladr_teal}{References}}
+% \vspace{1em}
+\vspace{1em}
+{\noindent\huge\textit{Appendix}}
+
+\vspace{1em}
+
+\noindent The experiment code, plotting code, some proof details and the TeX file of this report can be found at\\ 
+\url{https://github.com/Yangfan-SUN/Matrix-Sensing}.
+
+\vspace{1em}
+\begin{thebibliography}{9}
+
+\bibitem{Recht2010}
+B. Recht, M. Fazel, and P. A. Parrilo, 
+``Guaranteed Minimum-Rank Solutions of Linear Matrix Equations via Nuclear Norm Minimization,'' 
+\textit{SIAM Review}, vol. 52, no. 3, pp. 471--501, 2010.
+
+\bibitem{Fazel02}
+M.~Fazel.
+\newblock \emph{Matrix Rank Minimization with Applications}.
+\newblock PhD thesis, Stanford University, 2002.
+
+\bibitem{HiriartUrrutyLemarechal93}
+J.-B.~Hiriart-Urruty and C.~Lemar{\'e}chal.
+\newblock \emph{Convex Analysis and Minimization Algorithms II: Advanced Theory and Bundle Methods}.
+\newblock Springer-Verlag, New York, 1993.
+
+\bibitem{Chi2019}
+Y. Chi, Y. M. Lu, and Y. Chen, 
+``Nonconvex Optimization Meets Low-Rank Matrix Factorization: An Overview,'' 
+\textit{IEEE Transactions on Signal Processing}, vol. 67, no. 20, pp. 5239--5269, 2019.
+
+
+\bibitem{Bhojanapalli2016} S. Bhojanapalli, B. Neyshabur, and N. Srebro. Global Optimality of Local Search for Low Rank Matrix Recovery. arXiv preprint arXiv:1605.07221v2, 2016.
+
+\bibitem{Ma2024}
+Z. Ma,
+``Solving Matrix Sensing to Optimality under Realistic Settings,''
+\textit{Ph.D. dissertation, University of California, Berkeley}, 2024.
+
+\bibitem{Charisopoulos2021}
+V. Charisopoulos, Y. Chen, D. Davis, M. D{\'i}az, L. Ding, and D. Drusvyatskiy,
+``Low-rank matrix recovery with composite optimization: good conditioning and rapid convergence,''
+\textit{Foundations of Computational Mathematics}, vol. 21, no. 6, pp. 1505--1593, 2021.
+
+\bibitem{Wright2009}
+J. Wright, A. Ganesh, S. Rao, Y. Peng, and Y. Ma,
+``Robust principal component analysis: Exact recovery of corrupted low-rank matrices via convex optimization,''
+\textit{Advances in Neural Information Processing Systems}, vol. 22, 2009.
+
+\bibitem{Hu2021}
+E. J. Hu, Y. Shen, P. Wallis, Z. Allen-Zhu, Y. Li, S. Wang, L. Wang, and W. Chen,
+``LoRA: Low-rank adaptation of large language models,''
+\textit{arXiv preprint arXiv:2106.09685}, 2021.
+
+\bibitem{Lin2016}
+Z. Lin,
+``A review on low-rank models in data analysis,''
+\textit{Big Data and Information Analytics}, vol. 1, no. 2/3, pp. 139--161, 2016.
+
+\bibitem{Axler2015}
+S.~Axler.
+\newblock \emph{Linear Algebra Done Right}.
+\newblock Undergraduate Texts in Mathematics, 3rd ed., Springer, 2015.
+
+
+\end{thebibliography}
+
+\end{document}
